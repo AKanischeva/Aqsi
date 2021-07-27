@@ -1,0 +1,15 @@
+<resources>
+    <string name="app_name">Aqsi</string>
+    <string name="navigation_drawer_open">Open navigation drawer</string>
+    <string name="navigation_drawer_close">Close navigation drawer</string>
+    <string name="nav_header_title">Android Studio</string>
+    <string name="nav_header_subtitle">android.studio@android.com</string>
+    <string name="nav_header_desc">Navigation header</string>
+    <string name="action_settings">Settings</string>
+
+    <string name="menu_home">Новый маршрутный лист</string>
+    <string name="menu_gallery">Маршрутные листы</string>
+    <string name="scan_route_sheet_tip">Введите или сканируйте номер маршрутного листа</string>
+    <string name="scan_route_sheet_title">Номер маршрутного листа</string>
+    <string name="load_route_sheet_button">Загрузить</string>
+</resources>
