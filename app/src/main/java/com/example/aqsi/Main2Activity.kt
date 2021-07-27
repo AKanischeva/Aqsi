@@ -2,11 +2,7 @@ package com.example.aqsi
 
 import android.os.Bundle
 import android.view.Menu
-import android.view.MenuItem
-import android.widget.Button
-import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
-import androidx.appcompat.widget.ButtonBarLayout
 import androidx.appcompat.widget.Toolbar
 import androidx.drawerlayout.widget.DrawerLayout
 import androidx.navigation.findNavController
@@ -14,7 +10,16 @@ import androidx.navigation.ui.AppBarConfiguration
 import androidx.navigation.ui.navigateUp
 import androidx.navigation.ui.setupActionBarWithNavController
 import androidx.navigation.ui.setupWithNavController
+import com.example.aqsi.utils.FTPUtils
 import com.google.android.material.navigation.NavigationView
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import org.xmlpull.v1.XmlPullParser
+import org.xmlpull.v1.XmlPullParserFactory
+import java.io.File
+import java.io.FileInputStream
+import java.io.InputStream
 
 class Main2Activity : AppCompatActivity() {
 
@@ -41,16 +46,9 @@ class Main2Activity : AppCompatActivity() {
         setupActionBarWithNavController(navController, appBarConfiguration)
         navView.setupWithNavController(navController)
 
-//        scanBtn.setOnClickListener {
-//            scanCode()
-//        }
-
-//        var a = FTPClient()
-//        CoroutineScope(Dispatchers.IO).launch {
-//            a.connect("91.199.4.2", 21)
-//            a.login("ftpuser1", "password")
-//            a.disconnect()
-//        }
+        CoroutineScope(Dispatchers.IO).launch {
+            FTPUtils.init(this@Main2Activity)
+        }
     }
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {

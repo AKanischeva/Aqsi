@@ -1,3 +1,6 @@
 ext {
-    alpha = "alpha"
+    hostname = "91.199.4.2"
+    port = "21"
+    login = "ftpuser1"
+    password = "password"
 }

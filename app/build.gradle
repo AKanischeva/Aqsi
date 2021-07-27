@@ -16,12 +16,12 @@ android {
         targetSdkVersion 29
         versionCode 1
         versionName "1.0"
+        buildConfigField "String", "HOSTNAME", "\"${hostname}\""
+        buildConfigField "int", "PORT", "${port}"
+        buildConfigField "String", "LOGIN", "\"${login}\""
+        buildConfigField "String", "PASSWORD", "\"${password}\""
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
-        buildConfigField "String", "SERVER_URL", "\"http://dev.server.com\""
-        buildConfigField "String", "SERVER_URL1", "\"${alpha}\""
-
-
         ndk {
             abiFilters 'armeabi', 'armeabi-v7a', 'x86'
         }
