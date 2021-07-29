@@ -10,16 +10,15 @@ import androidx.navigation.ui.AppBarConfiguration
 import androidx.navigation.ui.navigateUp
 import androidx.navigation.ui.setupActionBarWithNavController
 import androidx.navigation.ui.setupWithNavController
+import com.example.aqsi.db.AppDatabase
+import com.example.aqsi.db.RouteSheetEntity
 import com.example.aqsi.utils.FTPUtils
 import com.google.android.material.navigation.NavigationView
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
-import org.xmlpull.v1.XmlPullParser
-import org.xmlpull.v1.XmlPullParserFactory
-import java.io.File
-import java.io.FileInputStream
-import java.io.InputStream
+
 
 class Main2Activity : AppCompatActivity() {
 
@@ -30,6 +29,7 @@ class Main2Activity : AppCompatActivity() {
         setContentView(R.layout.activity_main2)
         val toolbar: Toolbar = findViewById(R.id.toolbar)
         setSupportActionBar(toolbar)
+
 
         val drawerLayout: DrawerLayout = findViewById(R.id.drawer_layout)
         val navView: NavigationView = findViewById(R.id.nav_view)

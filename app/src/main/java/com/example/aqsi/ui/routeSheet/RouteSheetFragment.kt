@@ -9,8 +9,13 @@ import androidx.appcompat.widget.Toolbar
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
+import androidx.room.Room
 import com.example.aqsi.Main2Activity
 import com.example.aqsi.R
+import com.example.aqsi.db.AppDatabase
+import com.example.aqsi.db.RouteSheetEntity
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
 
 
 class RouteSheetFragment : Fragment() {
@@ -22,6 +27,7 @@ class RouteSheetFragment : Fragment() {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
+        
         routeSheetViewModel =
                 ViewModelProvider(this).get(RouteSheetViewModel::class.java)
         val root = inflater.inflate(R.layout.fragment_route_sheet, container, false)
@@ -35,6 +41,21 @@ class RouteSheetFragment : Fragment() {
 //        (activity as Main2Activity?)?.getSupportActionBar()?.hide()
 //
 //        (activity as Main2Activity?)?.setSupportActionBar(toolbar)
+//        val db = Room.databaseBuilder(
+//            textView.context,
+//            AppDatabase::class.java, "todo-list.db"
+//        ).build()
+        val db = AppDatabase(textView.context)
+
+        GlobalScope.launch {
+            db.routeSheetDao().insert(RouteSheetEntity("id", "123", "20.07.2021", 1))
+            val data = db.routeSheetDao().getAll()
+
+            data?.forEach {
+                println(it)
+            }
+        }
+
         return root
     }
 }
