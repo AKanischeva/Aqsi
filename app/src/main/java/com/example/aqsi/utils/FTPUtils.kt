@@ -4,6 +4,10 @@ import android.content.Context
 import xdroid.toaster.Toaster.toast
 import xdroid.toaster.Toaster.toastLong
 import com.example.aqsi.BuildConfig
+import com.example.aqsi.Status
+import com.example.aqsi.db.AppDatabase
+import com.example.aqsi.db.orders.OrdersEntity
+import com.example.aqsi.db.routeSheet.RouteSheetEntity
 import org.apache.commons.net.ftp.FTP
 import org.apache.commons.net.ftp.FTPClient
 import org.apache.commons.net.ftp.FTPFile
@@ -21,6 +25,8 @@ import ru.aqsi.commons.rmk.enums.ChequeType
 import ru.aqsi.commons.rmk.enums.PaymentType
 import ru.aqsi.commons.rmk.enums.TaxType
 import java.io.*
+import java.math.BigDecimal
+import java.text.SimpleDateFormat
 import java.util.*
 import kotlin.collections.ArrayList
 
@@ -54,32 +60,43 @@ object FTPUtils {
         val dirToSearch = DOWNLOAD_PATH
         val filter = FTPFileFilter { ftpFile -> ftpFile.isFile && ftpFile.name.contains("-$fileName-") && ftpFile.name.endsWith("-r.xml")}
         val result: Array<FTPFile>? = client.listFiles(dirToSearch, filter)
-        val file = result?.get(0)
-        file?.let {
-            downloadFile(context, file.name, true, {success ->
-                if (success) {
-                    var orders = parseRouteSheet(context)
-                    orders.forEach {
-                        downloadFile(context, it, false, {orderSuccess ->
-                            if(orderSuccess) {
-                                val order = parseOrder(context)
-                                AqsiOrders.createOrder(context, order)
-                                toast("Dowloaded " + it)
+        if(!result.isNullOrEmpty()) {
+            val file = result.get(0)
+            file?.let {
+                downloadFile(context, file.name, true) { success ->
+                    if (success) {
+                        var ordersXml = parseRouteSheet(context, fileName)
+                        val ordersEntity = arrayListOf<OrdersEntity>()
+                        ordersXml.forEach {
+                            downloadFile(context, it, false) { orderSuccess ->
+                                if (orderSuccess) {
+                                    val order = parseOrder(context)
+                                    AqsiOrders.createOrder(context, order)
+                                    ordersEntity.add(
+                                        OrdersEntity(
+                                            order.uid, order.number, order.dateTime, order.status,
+                                            order.getPriceAmount(),order.content.customer?:"", order.deliveryAddress ?: ""
+                                        )
+                                    )
+                                    toast("Dowloaded " + it)
+                                }
                             }
-                        })
+                        }
+                        AppDatabase(context).routeSheetDao().insert(
+                            RouteSheetEntity(
+                                UUID.randomUUID().toString(), "Маршрутный лист №$fileName", "20.07.2021", Status.IN_WORK.title,//date todo
+                                ordersEntity
+                            )
+                        )
+                    } else {
+                        toast("Error, not success")
+
                     }
-                    var a = 1
-                } else {
-                    toast("Error, not success")
-
                 }
-            })
-        } ?: kotlin.run {
-            toast("Error, file not found")
+            }
+        } else {
+            toast("File not found")
         }
-
-
-        val a = 5
     }
 
     fun downloadFile(context: Context, fileName: String, isRouteSheet: Boolean, callback: (isSuccess: Boolean) -> Unit) {
@@ -159,10 +176,10 @@ object FTPUtils {
                 )
             )
         )
+        var bargainSubject = -1
         try {
             while (event  != XmlPullParser.END_DOCUMENT) {
                 var tagName = parser.name
-                var bargainSubject = -1
                 when (event) {
                     XmlPullParser.START_TAG -> {
                         when (tagName) {
@@ -171,9 +188,9 @@ object FTPUtils {
                                 order.comment = parser.getAttributeValue(null, "comment")
                                 order.content = OrderContent(positions = arrayListOf(), type = ChequeType.INPUT.id)
                                 val c = order.content
-                                c?.customerContact = parser.getAttributeValue(null, "phone")
-                                c?.customer = parser.getAttributeValue(null, "client")
-                                c?.settlementAddress = parser.getAttributeValue(null, "address")
+                                c.customerContact = parser.getAttributeValue(null, "phone")
+                                c.customer = parser.getAttributeValue(null, "client")
+                                order.deliveryAddress = parser.getAttributeValue(null, "address")
                                 order.dateTime = ISO8601Utils.format(Date())//todo
                                 order.number = parser.getAttributeValue(null, "order_num")
                             }
@@ -223,7 +240,7 @@ object FTPUtils {
         return editable == "allow"
     }
 
-    fun parseRouteSheet(context: Context): ArrayList<String> {
+    fun parseRouteSheet(context: Context, number: String): ArrayList<String> {
         val file = File(context.filesDir, "routeSheet.xml")
         val targetStream: InputStream = FileInputStream(file)
         var factory = XmlPullParserFactory.newInstance()
@@ -245,5 +262,14 @@ object FTPUtils {
         return orders
     }
 
+    fun formatDate(date: String):String {
+        try {
+            val date = SimpleDateFormat("yyyy-MM-ddThh:mm:ssZ").parse(date)
+            return SimpleDateFormat("dd.MM.yyyy").format(date)
+        } catch (e: Exception) {
+            return date
+        }
+
+    }
 
 }

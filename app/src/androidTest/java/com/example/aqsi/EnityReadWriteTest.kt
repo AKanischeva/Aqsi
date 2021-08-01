@@ -5,8 +5,8 @@ import androidx.test.espresso.matcher.ViewMatchers.assertThat
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
 import com.example.aqsi.db.AppDatabase
-import com.example.aqsi.db.RouteSheetDao
-import com.example.aqsi.db.RouteSheetEntity
+import com.example.aqsi.db.routeSheet.RouteSheetDao
+import com.example.aqsi.db.routeSheet.RouteSheetEntity
 import org.hamcrest.CoreMatchers.equalTo
 import org.junit.After
 import org.junit.Before

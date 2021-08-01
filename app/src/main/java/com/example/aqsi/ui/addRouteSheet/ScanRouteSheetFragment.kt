@@ -19,6 +19,7 @@ import androidx.fragment.app.FragmentActivity
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import com.example.aqsi.R
+import com.example.aqsi.State
 import com.example.aqsi.utils.FTPUtils
 import com.google.zxing.integration.android.IntentIntegrator
 import kotlinx.android.synthetic.main.fragment_scan_route_sheet.*
@@ -41,11 +42,18 @@ class ScanRouteSheetFragment : Fragment() {
             ViewModelProvider(this).get(ScanRouteSheetViewModel::class.java)
         val root = inflater.inflate(R.layout.fragment_scan_route_sheet, container, false)
         val progress: DotsLoaderView = root.findViewById(R.id.dotsLoaderView)
-        scanRouteSheetViewModel.loading.observe(viewLifecycleOwner, Observer {loading ->
-            if(loading) {
-                progress.show()
-            } else {
-                progress.hide()
+        scanRouteSheetViewModel.state.observe(viewLifecycleOwner, Observer {state ->
+            when (state) {
+                is State.Loading -> {
+                    progress.show()
+                    CoroutineScope(Dispatchers.IO).launch {
+                        FTPUtils.findRouteSheet(root.context, scanField.text.toString())
+                        scanRouteSheetViewModel.state.postValue(State.Ready())
+                    }
+                }
+                is State.Ready -> {
+                    progress.hide()
+                }
             }
         })
         val scanBtn: ImageButton = root.findViewById(R.id.scanBtn)
@@ -64,12 +72,7 @@ class ScanRouteSheetFragment : Fragment() {
 
         val loadBtn: Button = root.findViewById(R.id.loadRouteSheet)
         loadBtn.setOnClickListener {
-            scanRouteSheetViewModel._loading.postValue(true)
-            CoroutineScope(Dispatchers.IO).launch {
-                FTPUtils.findRouteSheet(root.context, scanField.text.toString())
-                scanRouteSheetViewModel._loading.postValue(false)
-            }
-
+            scanRouteSheetViewModel.state.postValue(State.Loading())
         }
 
         return root

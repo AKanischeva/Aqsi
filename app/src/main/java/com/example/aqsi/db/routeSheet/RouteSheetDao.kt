@@ -1,4 +1,4 @@
-package com.example.aqsi.db
+package com.example.aqsi.db.routeSheet
 
 import androidx.room.*
 
@@ -10,6 +10,9 @@ interface RouteSheetDao {
 
     @Query("SELECT * FROM routesheet WHERE id = :id")
     fun getById(id: String): RouteSheetEntity?
+
+    @Query("DELETE FROM routesheet")
+    fun deleteAll()
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     fun insert(routeSheet: RouteSheetEntity?)
