@@ -41,9 +41,15 @@ class ScanRouteSheetFragment : Fragment() {
             ViewModelProvider(this).get(ScanRouteSheetViewModel::class.java)
         val root = inflater.inflate(R.layout.fragment_scan_route_sheet, container, false)
         val progress: DotsLoaderView = root.findViewById(R.id.dotsLoaderView)
+        val loadBtn: Button = root.findViewById(R.id.loadRouteSheet)
+        loadBtn.setOnClickListener {
+            scanRouteSheetViewModel.state.postValue(State.Loading())
+        }
         scanRouteSheetViewModel.state.observe(viewLifecycleOwner, Observer {state ->
             when (state) {
                 is State.Loading -> {
+                    loadBtn.setBackgroundColor(resources.getColor(R.color.light_gray))
+                    loadBtn.setOnClickListener { }
                     progress.show()
                     CoroutineScope(Dispatchers.IO).launch {
                         FTPUtils.findRouteSheet(root.context, scanField.text.toString())
@@ -51,6 +57,10 @@ class ScanRouteSheetFragment : Fragment() {
                     }
                 }
                 is State.Ready -> {
+                    loadBtn.setBackgroundColor(resources.getColor(R.color.blue))
+                    loadBtn.setOnClickListener {
+                        scanRouteSheetViewModel.state.postValue(State.Loading())
+                    }
                     progress.hide()
                 }
             }
@@ -70,10 +80,7 @@ class ScanRouteSheetFragment : Fragment() {
         }
 
 
-        val loadBtn: Button = root.findViewById(R.id.loadRouteSheet)
-        loadBtn.setOnClickListener {
-            scanRouteSheetViewModel.state.postValue(State.Loading())
-        }
+
 
         return root
 

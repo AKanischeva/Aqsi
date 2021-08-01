@@ -1,6 +1,7 @@
 package com.example.aqsi.db.routeSheet
 
 import androidx.room.*
+import com.example.aqsi.db.orders.OrdersEntity
 
 
 @Dao
@@ -22,4 +23,13 @@ interface RouteSheetDao {
 
     @Delete
     fun delete(routeSheet: RouteSheetEntity?)
+
+    fun updateStatus(routeSheetId: String, orderId: String, status: String) {
+        val routeSheet = getById(routeSheetId)
+        val orders: ArrayList<OrdersEntity>? = routeSheet?.ordersList
+        orders?.let {
+            it.find { it.id == orderId }?.status = status
+        }
+        update(routeSheet)
+    }
 }

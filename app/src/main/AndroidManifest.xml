@@ -30,14 +30,6 @@
             android:name=".ui.orders.OrdersActivity"
             android:screenOrientation="portrait"
             android:theme="@style/Theme.Aqsi.NoActionBar" />
-        <receiver
-            android:name=".ChequeReceiver"
-            android:enabled="true"
-            android:exported="true">
-            <intent-filter>
-                <action android:name="ru.aqsi.cashierworkplace.action.RECEIVE_ORDER_CHECK" />
-            </intent-filter>
-        </receiver>
     </application>
     <uses-feature android:name="android.hardware.camera.autofocus" />
     <uses-feature android:name="android.hardware.camera" />

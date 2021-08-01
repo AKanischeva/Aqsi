@@ -11,6 +11,8 @@ class OrdersEntity(
     @PrimaryKey
     var id: String = "",
     @ColumnInfo
+    var routeSheetId: String = "",
+    @ColumnInfo
     var number: String = "",
     @ColumnInfo
     var date: String = "",

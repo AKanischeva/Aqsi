@@ -1,54 +1,45 @@
 package com.example.aqsi.ui.orders
 
+import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
+import android.content.IntentFilter
+import android.net.ConnectivityManager
 import android.os.Bundle
-import android.view.Menu
+import android.view.View
+import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
-import androidx.appcompat.widget.Toolbar
-import androidx.drawerlayout.widget.DrawerLayout
-import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
-import androidx.navigation.findNavController
 import androidx.navigation.ui.AppBarConfiguration
-import androidx.navigation.ui.navigateUp
-import androidx.navigation.ui.setupActionBarWithNavController
-import androidx.navigation.ui.setupWithNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import com.example.aqsi.Main2ActivityViewModel
-import com.example.aqsi.R
-import com.example.aqsi.State
-import com.example.aqsi.Status
+import com.example.aqsi.*
 import com.example.aqsi.db.AppDatabase
 import com.example.aqsi.db.orders.OrdersEntity
-import com.example.aqsi.db.routeSheet.RouteSheetEntity
 import com.example.aqsi.ui.orders.adapter.OrdersAdapter
-import com.example.aqsi.ui.routeSheet.adapter.RouteSheetAdapter
-import com.example.aqsi.utils.FTPUtils
-import com.google.android.material.navigation.NavigationView
+import com.google.gson.Gson
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import ru.aqsi.commons.models.Cheque
+import ru.aqsi.commons.models.orders.OrderStatus
 import ru.aqsi.commons.rmk.AqsiOrders
 import steelkiwi.com.library.DotsLoaderView
 import xdroid.toaster.Toaster
-import java.math.BigDecimal
 import java.util.*
-import kotlin.collections.ArrayList
 
 
-class OrdersActivity : AppCompatActivity() {
+class OrdersActivity : AppCompatActivity(), BroadcastListener{
 
     private lateinit var appBarConfiguration: AppBarConfiguration
     private lateinit var viewModel: OrdersViewModel
     private lateinit var adapter: OrdersAdapter
+    private var receiver: BroadcastReceiver? = null
 
 
     suspend fun getOrdersFromDb(id: String): List<OrdersEntity> = withContext(Dispatchers.IO) {
-        val sheet = AppDatabase(this@OrdersActivity).routeSheetDao().getById(id)
-        sheet?.ordersList ?: arrayListOf()
+        AppDatabase(this@OrdersActivity).ordersDao().getByRouteSheetId(id) ?: emptyList()
     }
 
 //    suspend fun observeDb(id: String) = withContext(Dispatchers.IO) {
@@ -69,6 +60,10 @@ class OrdersActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        receiver = ChequeReceiver(this)
+        val filter = IntentFilter(AqsiOrders.ACTION_RECEIVE_ORDER_CHECK)
+        registerReceiver(receiver, filter)
+
         viewModel =
             ViewModelProvider(this).get(OrdersViewModel::class.java)
         setContentView(R.layout.activity_orders)
@@ -141,11 +136,25 @@ class OrdersActivity : AppCompatActivity() {
         }
     }
 
-//    override fun onResume() {
-//        super.onResume()
-//        if(viewModel.reloadNeeded) {
-//            recreate()
-//        }
-//        viewModel.reloadNeeded = false
-//    }
+    override fun doSomething(intent: Intent) {
+        CoroutineScope(Dispatchers.IO).launch {
+            Toaster.toast("Обнаружено сообщение: ")
+            val gson = Gson()
+            val json = gson.fromJson(intent.getStringExtra(AqsiOrders.ARG_CHECK_BODY), Cheque::class.java)
+            json.orderId?.let {
+                val dbOrder = AppDatabase(this@OrdersActivity).ordersDao().getById(it)
+                dbOrder?.let { order ->
+                    val newOrder = order.apply {
+                        this.status = OrderStatus.PAID.title
+                    }
+                    AppDatabase(this@OrdersActivity).ordersDao().update(newOrder)
+                    viewModel.orders = getOrdersFromDb(this@OrdersActivity.intent.getStringExtra(ROUTE_SHEET_ID) ?: "")
+                    AppDatabase(this@OrdersActivity).routeSheetDao().updateStatus(this@OrdersActivity.intent.getStringExtra(ROUTE_SHEET_ID) ?: "",
+                    newOrder.id, newOrder.status)
+                    //todo update routeSheetDao order
+                    viewModel.state.postValue(State.Ready())
+                }
+            }
+        }
+    }
 }

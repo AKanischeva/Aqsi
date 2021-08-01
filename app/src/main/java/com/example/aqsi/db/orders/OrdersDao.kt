@@ -12,6 +12,9 @@ interface OrdersDao {
     @Query("SELECT * FROM orders WHERE id = :id")
     fun getById(id: String): OrdersEntity?
 
+    @Query("SELECT * FROM orders WHERE routeSheetId = :id")
+    fun getByRouteSheetId(id: String): List<OrdersEntity>?
+
     @Query("DELETE FROM orders")
     fun deleteAll()
 

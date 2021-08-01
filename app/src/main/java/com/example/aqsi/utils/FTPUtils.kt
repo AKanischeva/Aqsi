@@ -26,7 +26,9 @@ import ru.aqsi.commons.rmk.enums.PaymentType
 import ru.aqsi.commons.rmk.enums.TaxType
 import java.io.*
 import java.math.BigDecimal
+import java.text.ParsePosition
 import java.text.SimpleDateFormat
+import java.time.Instant
 import java.util.*
 import kotlin.collections.ArrayList
 
@@ -60,6 +62,7 @@ object FTPUtils {
         val dirToSearch = DOWNLOAD_PATH
         val filter = FTPFileFilter { ftpFile -> ftpFile.isFile && ftpFile.name.contains("-$fileName-") && ftpFile.name.endsWith("-r.xml")}
         val result: Array<FTPFile>? = client.listFiles(dirToSearch, filter)
+        var routeSheetId = UUID.randomUUID().toString()
         if(!result.isNullOrEmpty()) {
             val file = result.get(0)
             file?.let {
@@ -72,19 +75,19 @@ object FTPUtils {
                                 if (orderSuccess) {
                                     val order = parseOrder(context)
                                     AqsiOrders.createOrder(context, order)
-                                    ordersEntity.add(
-                                        OrdersEntity(
-                                            order.uid, order.number, order.dateTime, order.status,
-                                            order.getPriceAmount(),order.content.customer?:"", order.deliveryAddress ?: ""
-                                        )
+                                    val orderDb = OrdersEntity(
+                                        order.uid, routeSheetId, order.number, order.dateTime, order.status,
+                                        order.getPriceAmount(),order.content.customer?:"", order.deliveryAddress ?: ""
                                     )
+                                    AppDatabase(context).ordersDao().insert(orderDb)
+                                    ordersEntity.add(orderDb)
                                     toast("Dowloaded " + it)
                                 }
                             }
                         }
                         AppDatabase(context).routeSheetDao().insert(
                             RouteSheetEntity(
-                                UUID.randomUUID().toString(), "Маршрутный лист №$fileName", "20.07.2021", Status.IN_WORK.title,//date todo
+                                routeSheetId, "Маршрутный лист №$fileName", "20.07.2021", Status.IN_WORK.title,//date todo
                                 ordersEntity
                             )
                         )
@@ -264,8 +267,8 @@ object FTPUtils {
 
     fun formatDate(date: String):String {
         try {
-            val date = SimpleDateFormat("yyyy-MM-ddThh:mm:ssZ").parse(date)
-            return SimpleDateFormat("dd.MM.yyyy").format(date)
+            val parsedDate = ISO8601Utils.parse(date, ParsePosition(0))
+            return SimpleDateFormat("dd.MM.yyyy").format(parsedDate)
         } catch (e: Exception) {
             return date
         }

@@ -4,6 +4,7 @@ import android.os.Bundle
 import android.view.Menu
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
+import androidx.core.content.ContextCompat
 import androidx.drawerlayout.widget.DrawerLayout
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
@@ -57,7 +58,6 @@ class Main2Activity : AppCompatActivity() {
         viewModel.state.observe(this, Observer { state ->
             when (state) {
                 is State.Loading -> {
-
                     progress.show()
                     CoroutineScope(Dispatchers.IO).launch {
                         AppDatabase(this@Main2Activity).routeSheetDao().deleteAll()//todo

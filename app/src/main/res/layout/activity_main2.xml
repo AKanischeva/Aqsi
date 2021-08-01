@@ -12,7 +12,7 @@
         android:id="@+id/dotsLoaderView"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:visibility="gone"
+        android:visibility="visible"
         app:dlv_item_drawable="@drawable/ic_circle_background"
         app:dlv_line_color="@color/blue"/>
 
