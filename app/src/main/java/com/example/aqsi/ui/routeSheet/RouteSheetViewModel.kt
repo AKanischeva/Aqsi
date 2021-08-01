@@ -3,11 +3,13 @@ package com.example.aqsi.ui.routeSheet
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import com.example.aqsi.State
 
 class RouteSheetViewModel : ViewModel() {
 
-    private val _text = MutableLiveData<String>().apply {
-        value = "This is gallery Fragment"
+    val _loading = MutableLiveData<Boolean>().apply {
+        value = false
     }
-    val text: LiveData<String> = _text
+    var loading: LiveData<Boolean> = _loading
+    val state = MutableLiveData<State>()
 }

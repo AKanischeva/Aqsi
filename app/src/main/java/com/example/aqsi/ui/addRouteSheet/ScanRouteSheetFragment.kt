@@ -5,7 +5,6 @@ import android.content.Intent
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
-import android.view.View.OnTouchListener
 import android.view.ViewGroup
 import android.view.inputmethod.InputMethodManager
 import android.widget.Button
@@ -56,6 +55,7 @@ class ScanRouteSheetFragment : Fragment() {
                 }
             }
         })
+
         val scanBtn: ImageButton = root.findViewById(R.id.scanBtn)
         scanBtn.setOnClickListener {
             scanRouteSheetViewModel.scanCode(this)
@@ -80,7 +80,7 @@ class ScanRouteSheetFragment : Fragment() {
     }
     fun hideSoftKeyboard(activity: FragmentActivity?) {
         val inputMethodManager = activity?.getSystemService(Activity.INPUT_METHOD_SERVICE) as InputMethodManager
-        inputMethodManager.hideSoftInputFromWindow(activity.currentFocus!!.windowToken, 0)
+        inputMethodManager.hideSoftInputFromWindow(activity.currentFocus?.windowToken, 0)
     }
 
 

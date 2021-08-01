@@ -20,6 +20,9 @@ import com.google.android.material.navigation.NavigationView
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import steelkiwi.com.library.DotsLoaderView
+import java.math.BigDecimal
+import java.util.*
 
 
 class Main2Activity : AppCompatActivity() {
@@ -50,10 +53,25 @@ class Main2Activity : AppCompatActivity() {
         )
         setupActionBarWithNavController(navController, appBarConfiguration)
         navView.setupWithNavController(navController)
+        val progress: DotsLoaderView = findViewById(R.id.dotsLoaderView)
+        viewModel.state.observe(this, Observer { state ->
+            when (state) {
+                is State.Loading -> {
 
-        CoroutineScope(Dispatchers.IO).launch {
-            FTPUtils.init(this@Main2Activity)
-        }
+                    progress.show()
+                    CoroutineScope(Dispatchers.IO).launch {
+                        AppDatabase(this@Main2Activity).routeSheetDao().deleteAll()//todo
+                        FTPUtils.init(this@Main2Activity)
+                        viewModel.state.postValue(State.Ready())
+                    }
+                }
+                is State.Ready -> {
+                    progress.hide()
+                }
+            }
+        })
+        viewModel.state.postValue(State.Loading())
+
     }
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {

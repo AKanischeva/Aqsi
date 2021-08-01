@@ -8,6 +8,14 @@
     android:fitsSystemWindows="true"
     tools:openDrawer="start">
 
+    <steelkiwi.com.library.DotsLoaderView
+        android:id="@+id/dotsLoaderView"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:visibility="gone"
+        app:dlv_item_drawable="@drawable/ic_circle_background"
+        app:dlv_line_color="@color/blue"/>
+
     <include
         layout="@layout/app_bar_main"
         android:layout_width="match_parent"
