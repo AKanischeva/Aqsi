@@ -12,4 +12,18 @@
     <string name="scan_route_sheet_tip">Введите или сканируйте номер маршрутного листа</string>
     <string name="scan_route_sheet_title">Номер маршрутного листа</string>
     <string name="load_route_sheet_button">Загрузить</string>
+    <string name="code_scanned_title">Штрихкод отсканирован</string>
+    <string name="code_scan_again">Сканировать ещё раз</string>
+    <string name="code_scan_ready">Готово</string>
+    <string name="code_scan_not_scanned">Штрихкод не отсканирован</string>
+    <string name="route_sheet_download_error">Ошибка загрузки маршрутного листа</string>
+    <string name="route_sheet_download_file_not_found">Маршрутный лист не найден</string>
+    <string name="route_sheet_download_success">Маршрутный лист успешно загружен</string>
+    <string name="search_text_hint">Поиск по номеру маршрутного листа</string>
+    <string name="order_date">Дата:</string>
+    <string name="order_recipient">Получатель:</string>
+    <string name="order_address">Адрес:</string>
+    <string name="route_sheet_date">Дата:</string>
+
+
 </resources>

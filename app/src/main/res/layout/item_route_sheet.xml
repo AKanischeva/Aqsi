@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/actionContainer"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginTop="15dp"
+    android:background="@color/white"
+    app:layout_constraintBottom_toBottomOf="parent"
+    app:layout_constraintEnd_toEndOf="parent"
+    app:layout_constraintHorizontal_bias="0.5"
+    app:layout_constraintStart_toStartOf="parent">
+
+    <TextView
+        android:layout_marginLeft="30dp"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        android:id="@+id/routeSheetNumber"
+        android:layout_width="wrap_content"
+        android:textSize="20dp"
+        android:layout_height="wrap_content"
+        android:textColor="@color/dark_gray"
+        android:fontFamily="sans-serif-black"
+        tools:text="Маршрутный лист №1" />
+
+    <TextView
+        app:layout_constraintStart_toStartOf="@id/routeSheetNumber"
+        app:layout_constraintTop_toBottomOf="@id/routeSheetNumber"
+        android:id="@+id/dateText"
+        android:textSize="16sp"
+        android:layout_marginTop="15dp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textColor="@color/text_gray"
+        android:text="@string/route_sheet_date" />
+
+    <TextView
+        app:layout_constraintStart_toEndOf="@id/dateText"
+        app:layout_constraintTop_toTopOf="@id/dateText"
+        app:layout_constraintBottom_toBottomOf="@id/dateText"
+
+        android:layout_marginLeft="50dp"
+        android:id="@+id/dateValue"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textColor="@color/dark_gray"
+        tools:text="30.06.21" />
+
+    <TextView
+        android:background="@drawable/bg_oval_button_green"
+        app:layout_constraintBottom_toBottomOf="@id/dateText"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="@id/dateText"
+        android:layout_marginLeft="20dp"
+        android:layout_marginRight="30dp"
+        android:id="@+id/status"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textColor="@color/white"
+        android:fontFamily="sans-serif-medium"
+        tools:text="В работе" />
+
+
+    <View
+        android:id="@+id/divider"
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:background="@color/divider_gray"
+        android:layout_marginTop="15dp"
+        app:layout_constraintTop_toBottomOf="@id/dateText" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>
