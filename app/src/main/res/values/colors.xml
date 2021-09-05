@@ -14,4 +14,7 @@
     <color name="violet">#875DD3</color>
     <color name="dark_gray">#2B2B2B</color>
     <color name="blue">#1892FF</color>
+    <color name="progress">#80FFFFFF</color>
+    <color name="searchBackground">#e1e1e1</color>
+    <color name="searchText">#6a6b7e</color>
 </resources>

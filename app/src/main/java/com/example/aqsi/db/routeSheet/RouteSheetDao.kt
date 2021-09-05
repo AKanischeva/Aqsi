@@ -24,7 +24,7 @@ interface RouteSheetDao {
     @Delete
     fun delete(routeSheet: RouteSheetEntity?)
 
-    fun updateStatus(routeSheetId: String, orderId: String, status: String) {
+    fun updateOrderStatus(routeSheetId: String, orderId: String, status: String) {
         val routeSheet = getById(routeSheetId)
         val orders: ArrayList<OrdersEntity>? = routeSheet?.ordersList
         orders?.let {

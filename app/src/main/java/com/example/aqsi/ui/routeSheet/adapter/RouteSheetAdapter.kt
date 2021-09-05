@@ -29,7 +29,7 @@ class RouteSheetAdapter(val onItemClick: (routeSheet: RouteSheetEntity) -> Unit)
         val item = items[holder.adapterPosition]
         holder.itemView.dateValue.text = FTPUtils.formatDate(item.date)
         holder.itemView.status.text = item.status
-        holder.itemView.routeSheetNumber.text = item.number
+        holder.itemView.routeSheetNumber.text = "Маршрутный лист №${item.number}"
 
         when (item.status) {
             Status.IN_WORK.title -> {

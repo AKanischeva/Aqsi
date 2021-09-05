@@ -45,7 +45,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:textColor="@color/text_gray"
-        android:text="Дата:" />
+        android:text="@string/order_date" />
 
     <TextView
         app:layout_constraintStart_toEndOf="@id/dateText"
@@ -81,7 +81,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:textColor="@color/text_gray"
-        android:text="Получатель:" />
+        android:text="@string/order_recipient" />
 
     <TextView
         app:layout_constraintStart_toEndOf="@id/recipientText"
@@ -104,7 +104,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:textColor="@color/text_gray"
-        android:text="Адрес:" />
+        android:text="@string/order_address" />
 
     <TextView
         app:layout_constraintStart_toEndOf="@id/addressText"

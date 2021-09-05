@@ -8,13 +8,22 @@
     android:fitsSystemWindows="true"
     tools:openDrawer="start">
 
-    <steelkiwi.com.library.DotsLoaderView
-        android:id="@+id/dotsLoaderView"
+    <RelativeLayout
+        android:id="@+id/progress_layout"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:visibility="visible"
-        app:dlv_item_drawable="@drawable/ic_circle_background"
-        app:dlv_line_color="@color/blue"/>
+        android:background="@color/progress"
+        android:clickable="true"
+        android:visibility="gone">
+
+        <steelkiwi.com.library.DotsLoaderView
+            android:id="@+id/dotsLoaderView"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:visibility="visible"
+            app:dlv_item_drawable="@drawable/ic_circle_background"
+            app:dlv_line_color="@color/blue"/>
+    </RelativeLayout>
 
     <include
         layout="@layout/app_bar_main"

@@ -20,7 +20,6 @@ class ScanRouteSheetViewModel : ViewModel() {
         integrator.setCaptureActivity(CaptureAct::class.java)
         integrator.setOrientationLocked(true)
         integrator.setDesiredBarcodeFormats(IntentIntegrator.ALL_CODE_TYPES)
-        integrator.setPrompt("Scanning code todo")
         integrator.initiateScan()
     }
 

@@ -1,34 +1,33 @@
 package com.example.aqsi.utils
 
 import android.content.Context
-import xdroid.toaster.Toaster.toast
-import xdroid.toaster.Toaster.toastLong
 import com.example.aqsi.BuildConfig
+import com.example.aqsi.R
 import com.example.aqsi.Status
 import com.example.aqsi.db.AppDatabase
 import com.example.aqsi.db.orders.OrdersEntity
 import com.example.aqsi.db.routeSheet.RouteSheetEntity
+import com.google.gson.internal.bind.util.ISO8601Utils
 import org.apache.commons.net.ftp.FTP
 import org.apache.commons.net.ftp.FTPClient
 import org.apache.commons.net.ftp.FTPFile
 import org.apache.commons.net.ftp.FTPFileFilter
 import org.xmlpull.v1.XmlPullParser
 import org.xmlpull.v1.XmlPullParserFactory
-import ru.aqsi.commons.rmk.AqsiOrders
-import com.google.gson.internal.bind.util.ISO8601Utils
 import ru.aqsi.commons.models.orders.Order
 import ru.aqsi.commons.models.orders.OrderContent
 import ru.aqsi.commons.models.orders.OrderPosition
 import ru.aqsi.commons.models.orders.OrderStatus
+import ru.aqsi.commons.rmk.AqsiOrders
 import ru.aqsi.commons.rmk.enums.BargainSubject
 import ru.aqsi.commons.rmk.enums.ChequeType
 import ru.aqsi.commons.rmk.enums.PaymentType
 import ru.aqsi.commons.rmk.enums.TaxType
+import xdroid.toaster.Toaster.toast
+import xdroid.toaster.Toaster.toastLong
 import java.io.*
-import java.math.BigDecimal
 import java.text.ParsePosition
 import java.text.SimpleDateFormat
-import java.time.Instant
 import java.util.*
 import kotlin.collections.ArrayList
 
@@ -45,12 +44,7 @@ object FTPUtils {
             client.login(BuildConfig.LOGIN, BuildConfig.PASSWORD)
             client.enterLocalPassiveMode()
             //todo success
-
-//            downloadFile(context)//todo
-//            parseXml(context)
-
 //            client.logout()
-//
 //            client.disconnect()
             return true
         } catch (e: Exception) {
@@ -81,32 +75,30 @@ object FTPUtils {
                                     )
                                     AppDatabase(context).ordersDao().insert(orderDb)
                                     ordersEntity.add(orderDb)
-                                    toast("Dowloaded " + it)
                                 }
                             }
                         }
+                        val sdf = SimpleDateFormat("dd.MM.yyyy")
+                        val routeSheetDate = sdf.format(Date())
                         AppDatabase(context).routeSheetDao().insert(
                             RouteSheetEntity(
-                                routeSheetId, "Маршрутный лист №$fileName", "20.07.2021", Status.IN_WORK.title,//date todo
+                                routeSheetId, fileName, routeSheetDate, Status.IN_WORK.title,
                                 ordersEntity
                             )
                         )
                     } else {
-                        toast("Error, not success")
-
+                        toast(context.getString(R.string.route_sheet_download_error))
                     }
                 }
             }
         } else {
-            toast("File not found")
+            toast(context.getString(R.string.route_sheet_download_file_not_found))
         }
     }
 
     fun downloadFile(context: Context, fileName: String, isRouteSheet: Boolean, callback: (isSuccess: Boolean) -> Unit) {
         try {
             client.setFileType(FTP.BINARY_FILE_TYPE)
-
-//             APPROACH #1: using retrieveFile(String, OutputStream)
             val remoteFile1 = "$DOWNLOAD_PATH/$fileName"
             val fileName = if(isRouteSheet) {
                 "routeSheet.xml"
@@ -123,7 +115,7 @@ object FTPUtils {
             var success: Boolean = client.retrieveFile(remoteFile1, outputStream1)
             outputStream1.close()
             if (success) {
-                toastLong("Route sheet has been downloaded successfully")
+                toast(context.getString(R.string.route_sheet_download_success))
                 callback.invoke(true)
             } else {
                 callback.invoke(false)
@@ -154,14 +146,14 @@ object FTPUtils {
         var editText = ""
         val order = Order(
             uid = UUID.randomUUID().toString(),
-            number = "X-19",
+            number = "",
             externalSystem = "aqsi",
             dateTime = ISO8601Utils.format(Date()),
             cashier = null,
             clientId = null,
-            deliveryAddress = "Ростов на дону",
-            pickAddress = "г. Москва",
-            comment = "Как можно быстрее!",
+            deliveryAddress = "",
+            pickAddress = "",
+            comment = "",
             status = OrderStatus.NOT_PAID.title,
             updatedAt = ISO8601Utils.format(Date()),
             content = OrderContent(
@@ -169,9 +161,9 @@ object FTPUtils {
                 positions = arrayListOf(
                     OrderPosition(
                         id = UUID.randomUUID().toString(),
-                        text = "Мороженое",
-                        quantity = 5.0,
-                        price = 101.93,
+                        text = "",
+                        quantity = 0.0,
+                        price = 0.0,
                         tax = TaxType.TAX_20.id,
                         paymentMethodType = PaymentType.FULL_PAYMENT.id,
                         paymentSubjectType = BargainSubject.GOODS.id
@@ -187,15 +179,17 @@ object FTPUtils {
                     XmlPullParser.START_TAG -> {
                         when (tagName) {
                             "order" -> {
-//                                order.uid = parser.getAttributeValue(null, "order_num")
                                 order.comment = parser.getAttributeValue(null, "comment")
                                 order.content = OrderContent(positions = arrayListOf(), type = ChequeType.INPUT.id)
                                 val c = order.content
                                 c.customerContact = parser.getAttributeValue(null, "phone")
                                 c.customer = parser.getAttributeValue(null, "client")
                                 order.deliveryAddress = parser.getAttributeValue(null, "address")
-                                order.dateTime = ISO8601Utils.format(Date())//todo
                                 order.number = parser.getAttributeValue(null, "order_num")
+                                val date = parser.getAttributeValue(null, "order_date")
+                                val time = parser.getAttributeValue(null, "order_time")
+                                val sdf = SimpleDateFormat("dd.MM.yyyy hh:mm:ss")
+                                order.dateTime = ISO8601Utils.format(sdf.parse(date + " " + time))
                             }
                             "goods" -> {
                                 bargainSubject = BargainSubject.GOODS.id
@@ -208,10 +202,10 @@ object FTPUtils {
                             }
                             "item" -> {
                                 if(bargainSubject == BargainSubject.PAYMENT.id) {
-                                    //todo
+
                                 } else {
                                     var position = OrderPosition(
-                                        tax = TaxType.TAX_20.id,//todo
+                                        tax = parser.getAttributeValue(null, "tax").toInt(),
                                         editable = isEditable(parser.getAttributeValue(null, "edit")),
                                         quantity = parser.getAttributeValue(null, "quantity").toDouble(),
                                         unitOfMeasurement = parser.getAttributeValue(null, "unit"),
@@ -272,7 +266,6 @@ object FTPUtils {
         } catch (e: Exception) {
             return date
         }
-
     }
 
 }

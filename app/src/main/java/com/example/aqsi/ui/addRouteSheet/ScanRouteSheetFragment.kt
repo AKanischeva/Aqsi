@@ -7,10 +7,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.view.inputmethod.InputMethodManager
-import android.widget.Button
-import android.widget.EditText
-import android.widget.ImageButton
-import android.widget.Toast
+import android.widget.*
 import androidx.appcompat.app.AlertDialog
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.fragment.app.Fragment
@@ -42,14 +39,19 @@ class ScanRouteSheetFragment : Fragment() {
         val root = inflater.inflate(R.layout.fragment_scan_route_sheet, container, false)
         val progress: DotsLoaderView = root.findViewById(R.id.dotsLoaderView)
         val loadBtn: Button = root.findViewById(R.id.loadRouteSheet)
+
+        val progressLayout: RelativeLayout = root.findViewById(R.id.progress_layout)
+
+
         loadBtn.setOnClickListener {
             scanRouteSheetViewModel.state.postValue(State.Loading())
         }
         scanRouteSheetViewModel.state.observe(viewLifecycleOwner, Observer {state ->
             when (state) {
                 is State.Loading -> {
+                    progressLayout.visibility = View.VISIBLE
                     loadBtn.setBackgroundColor(resources.getColor(R.color.light_gray))
-                    loadBtn.setOnClickListener { }
+                    loadBtn.setOnClickListener(null)
                     progress.show()
                     CoroutineScope(Dispatchers.IO).launch {
                         FTPUtils.findRouteSheet(root.context, scanField.text.toString())
@@ -57,8 +59,10 @@ class ScanRouteSheetFragment : Fragment() {
                     }
                 }
                 is State.Ready -> {
+                    progressLayout.visibility = View.GONE
                     loadBtn.setBackgroundColor(resources.getColor(R.color.blue))
                     loadBtn.setOnClickListener {
+                        scanField.setText("")
                         scanRouteSheetViewModel.state.postValue(State.Loading())
                     }
                     progress.hide()
@@ -98,15 +102,15 @@ class ScanRouteSheetFragment : Fragment() {
             if (result != null && result.contents != null) {
                 val builder = AlertDialog.Builder(it)
                 builder.setMessage(result.contents)
-                builder.setTitle("TITLE todo")
-                builder.setPositiveButton("scan again todo", { dialog, which -> scanRouteSheetViewModel.scanCode(this) })
-                builder.setNegativeButton("finish todo", {dialog, which ->
+                builder.setTitle(getString(R.string.code_scanned_title))
+                builder.setPositiveButton(getString(R.string.code_scan_again), { dialog, which -> scanRouteSheetViewModel.scanCode(this) })
+                builder.setNegativeButton(getString(R.string.code_scan_ready), {dialog, which ->
                     dialog.dismiss()
                     scanField.setText(result.contents)})
                 val dialog = builder.create()
                 dialog.show()
             } else {
-                Toast.makeText(it, "Toast todo", Toast.LENGTH_LONG).show()
+                Toast.makeText(it, getString(R.string.code_scan_not_scanned), Toast.LENGTH_LONG).show()
                 super.onActivityResult(requestCode, resultCode, data)
             }
         }

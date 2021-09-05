@@ -15,4 +15,5 @@ class OrdersViewModel : ViewModel() {
     val state = MutableLiveData<State>()
     var orders: List<OrdersEntity> = listOf()
     var reloadNeeded = false
+    var routeSheetId = ""
 }

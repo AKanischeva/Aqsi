@@ -6,7 +6,7 @@ import android.content.Intent
 
 class ChequeReceiver(private val listener: BroadcastListener) : BroadcastReceiver() {
     override fun onReceive(context: Context, intent: Intent) {
-        listener.doSomething(intent)
+        listener.processCheck(intent)
     }
 
 }
